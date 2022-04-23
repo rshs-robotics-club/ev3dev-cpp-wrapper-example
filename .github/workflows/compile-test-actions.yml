@@ -37,6 +37,7 @@ jobs:
         run: |
           export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
           cd main
+          ls
           sudo git submodule update --init --recursive
       - name: compile it
         run: |
