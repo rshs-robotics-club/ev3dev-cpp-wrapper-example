@@ -20,6 +20,8 @@ jobs:
         run: sudo bash ./scripts/compile.sh
   compile-inside-container:
     runs-on: ubuntu-latest
+    env:
+      GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
     container: 
       image: ev3dev/debian-stretch-cross:latest
       options: --user root -e GIT_DISCOVERY_ACROSS_FILESYSTEM=1
