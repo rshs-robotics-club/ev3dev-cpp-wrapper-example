@@ -33,7 +33,8 @@ jobs:
           path: main
       - name: install submodule
         run: |
-          sudo cd ev3dev-cpp-wrapper-example/ev3dev-cpp-wrapper-example/main
+          sudo chmod o+x ev3dev-cpp-wrapper-example/ev3dev-cpp-wrapper-example/main
+          cd ev3dev-cpp-wrapper-example/ev3dev-cpp-wrapper-example/main
           sudo git submodule update --init --recursive
       - name: compile it
         run: |
