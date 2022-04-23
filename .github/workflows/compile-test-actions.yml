@@ -35,6 +35,7 @@ jobs:
           path: main
       - name: install submodule
         run: |
+          export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
           sudo git submodule update --init --recursive
       - name: compile it
         run: |
