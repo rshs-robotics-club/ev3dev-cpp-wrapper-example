@@ -36,7 +36,7 @@ jobs:
       - name: install submodule
         run: |
           export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
-          cd main
+          cd main/ev3dev-cpp-template-wrapper
           ls
           sudo git submodule update --init --recursive
       - name: compile it
