@@ -24,6 +24,10 @@ jobs:
       image: ev3dev/debian-stretch-cross:latest
       options: --user root
     steps:
+      - name: install git
+        run: | 
+          sudo apt-get update
+          sudo apt-get install git
       - uses: actions/checkout@v3
         with: 
           path: main
