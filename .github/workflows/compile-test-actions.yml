@@ -1,0 +1,36 @@
+name: compile-test
+on: [pull_request]
+jobs:
+  compile-out-of-container:
+    runs-on: ubuntu-latest
+    steps:
+      #- name: install Docker
+      #  run: |
+      #    sudo apt-get update
+      #    sudo apt install snap
+      #    sudo snap install docker
+
+      - name: Download this repo
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Setup docker images
+        run: sudo bash ./ev3dev-cpp-template-wrapper/scripts/dockersetup.sh
+      - name: compile the contents
+        run: sudo bash ./scripts/compile.sh
+  compile-inside-container:
+    runs-on: ubuntu-latest
+    container: 
+      image: ev3dev/debian-stretch-cross:latest
+      options: --user root
+    steps:
+      - uses: actions/checkout@v3
+        with: 
+          path: main
+          submodules: 'true'
+      - name: compile it
+        run: |
+          cd main
+          sudo chmod +x ./scripts/runWithinContainer.sh
+          sudo bash ./scripts/runWithinContainer.sh
+        shell: bash
