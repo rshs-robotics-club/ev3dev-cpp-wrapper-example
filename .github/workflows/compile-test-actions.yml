@@ -33,6 +33,7 @@ jobs:
           path: main
       - name: install submodule
         run: |
+          cd ev3dev-cpp-wrapper-example/ev3dev-cpp-wrapper-example/main
           git submodule update --init --recursive
       - name: compile it
         run: |
