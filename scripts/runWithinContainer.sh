@@ -14,7 +14,7 @@
 #    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #    You should have received a copy of the GNU General Public License 
 #    along with The Ev3dev C++ Wrapper Library. If not, see <https://www.gnu.org/licenses/>.
-echo -e "\e[1;37m"
+# echo -e "\e[1;37m"
 # a function for creating a bar showing file size and the limit
 # $1 is file name
 # $2 is the max kilobytes
