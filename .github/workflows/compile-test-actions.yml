@@ -2,7 +2,7 @@ name: compile-test
 on: [pull_request]
 jobs:
   compile-out-of-container:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       #- name: install Docker
       #  run: |
@@ -15,9 +15,9 @@ jobs:
         with:
           submodules: 'true'
       - name: Setup docker images
-        run: bash ./ev3dev-cpp-template-wrapper/scripts/dockersetup.sh
+        run: sudo bash ./ev3dev-cpp-template-wrapper/scripts/dockersetup.sh
       - name: compile the contents
-        run: bash ./scripts/compile.sh
+        run: sudo bash ./scripts/compile.sh
   compile-inside-container:
     runs-on: ubuntu-latest
     container: 
@@ -33,8 +33,8 @@ jobs:
           path: main
       - name: install submodule
         run: |
-          sudo chmod o+x {{$GITHUB_WORKSPACE}}/main
-          cd {{$GITHUB_WORKSPACE}}/main
+          sudo chmod o+x $GITHUB_WORKSPACE/main
+          cd $GITHUB_WORKSPACE/main
           sudo git submodule update --init --recursive
       - name: compile it
         run: |
