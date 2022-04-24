@@ -20,14 +20,23 @@ jobs:
         run: sudo bash ./scripts/compile.sh
   compile-inside-container:
     runs-on: ubuntu-latest
+    env:
+      GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
     container: 
       image: ev3dev/debian-stretch-cross:latest
-      options: --user root
+      options: --user root -e GIT_DISCOVERY_ACROSS_FILESYSTEM=1
     steps:
+      - name: install git
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git
       - uses: actions/checkout@v3
         with: 
           path: main
-          submodules: 'true'
+      - uses: actions/checkout@v3
+        with:
+          repository: rshs-robotics-club/ev3dev-cpp-template-wrapper
+          path: main/ev3dev-cpp-template-wrapper
       - name: compile it
         run: |
           cd main
