@@ -17,7 +17,10 @@
 CONTAINER_NAME="EV3PROGRAM"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 SRC_DIR=${SCRIPT_DIR}/../
-if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    docker rm ${CONTAINER_NAME}
+    docker run --entrypoint /${SRC_DIR}/scripts/runWithinContainer.sh --name ${CONTAINER_NAME} -v /${SRC_DIR}:/${SRC_DIR} -w /${SRC_DIR} ev3cc
+elif [[ "$OSTYPE" == "darwin"* ]]; then
     docker rm ${CONTAINER_NAME}
     docker run --entrypoint /${SRC_DIR}/scripts/runWithinContainer.sh --name ${CONTAINER_NAME} -v /${SRC_DIR}:/${SRC_DIR} -w /${SRC_DIR} ev3cc
 else

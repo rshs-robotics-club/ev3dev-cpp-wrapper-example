@@ -1,2 +1,4 @@
 /bin/
 /build/
+/src/*
+!/src/copyfromhere/README.md
