@@ -26,7 +26,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_subdirectory(ev3dev-cpp-template-wrapper .${CURRENT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/bin)
 
-project(container_project VERSION 2.5.1)
+project(container_project VERSION 2.5.2)
 file(GLOB files "./src/*.cpp")
 set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 foreach(file ${files})
