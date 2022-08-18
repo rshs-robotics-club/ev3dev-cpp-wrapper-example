@@ -14,62 +14,72 @@
 #    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #    You should have received a copy of the GNU General Public License 
 #    along with The Ev3dev C++ Wrapper Library. If not, see <https://www.gnu.org/licenses/>.
-# echo -e "\e[1;37m"
-# a function for creating a bar showing file size and the limit
-# $1 is file name
-# $2 is the max kilobytes
-# $3 is file path
-# $4 is progress bar length
-function sizeBar() {
-    FILENAME=$1
-    FILEPATH=$3
-    FILESIZE=$(stat -c%s "$FILEPATH")
-    FILE_KILOBYTES=$(($FILESIZE / 1000))
-    MAX_KILOBYTES=$2
-    GREENBEGIN="\e[0;32m"
-    COLOREND="\e[1;37m"
-    REDBEGIN="\e[0;31m"
-    echo
-    echo -e "$GREENBEGIN$FILENAME$COLOREND's size is $GREENBEGIN$FILE_KILOBYTES$COLOREND kilobytes out of the $REDBEGIN$MAX_KILOBYTES$COLOREND kilobytes allowed"
-    if (($FILE_KILOBYTES > $MAX_KILOBYTES)); then
-        echo "The file is $REDBEGIN $(($FILE_KILOBYTES - $MAX_KILOBYTES)) $COLOREND kilobytes too large"
-        echo
-        return
-    fi
-    PROGRESS_BAR_LENGTH=$4
-    echo -e -n "$GREENBEGIN 0 $COLOREND kB ["
-    for ((i=0; i<$(($FILE_KILOBYTES* $PROGRESS_BAR_LENGTH / $MAX_KILOBYTES)); i++)); do
-        echo -n "="
-    done
-    echo -n ">"
-    for ((i=$(($FILE_KILOBYTES* $PROGRESS_BAR_LENGTH / $MAX_KILOBYTES)); i<$PROGRESS_BAR_LENGTH; i++)); do
-        echo -n " "
-    done
-    echo -n -e "] $REDBEGIN$MAX_KILOBYTES$COLOREND kB"
+echo -e "\e[1;37m"
 
-    echo -e "\e[1;37m"
-    echo
-    return
-}
+# processing flags -----------------------------------------------------------------------
 
+# flag "-n" indicates that a new file has been added and reconfiguration is required
+# clock skew detected may be a side effect but should not be a problem
+newFile=false
 
+# flag "-w" indicates that the bin folder should be wiped and subsequently rebuilt
+# the "-n" flag will be used if the "-w" flag is used
+wipeBin=false
 
-echo "wakeup"
-echo $PATH
-echo "setting up cmake env"
+# flag "-O<optimization level>" indicates the optimization level that should be used.
+# the "-n" flag will be used if the "-O" flag is used
+optimizationLevel="-Os"
 
-cmake ./ -G"Unix Makefiles" -S"src" -B"build"
+# flag "-v" indicates the verbosity (whether if it will check the file size or not)
+# making it verbose may make the build slower
+verbose=false
 
-echo "building your project"
+while getopts 'nwO:v' flag; do
+  case "${flag}" in
+    n) newFile=true ;;
+    w) wipeBin=true
+        newFile=true ;;
+    O) optimizationLevel="-O${OPTARG}"
+        newFile=true ;;
+    v) verbose=true 
+        newFile=true ;;
+    *) echo "UNKNOWN FLAG ${flag}"
+       exit 1 ;;
+  esac
+done
 
-cmake --build build
-# display filesize of the library
-#sizeBar "the library" "500" "./bin/libev3dev-cpp-template-wrapper.a" "50"
-# display filesize of the examples
-#sizeBar "spin_a_motor.elf" "500" "./bin/examples/spin_a_motor/spin_a_motor.elf" "50"
-#mkdir "./bin/finished/"
-#cp "./bin/examples/spin_a_motor/spin_a_motor.elf" "./bin/finished/spin_a_motor.elf"
-#sizeBar "move_until_distance.elf" "500" "./bin/examples/move_until_distance/move_until_distance.elf" "50"
-#echo "start of program"
-#qemu-arm-static -L /usr/arm-linux-gnueabi/ ./sentFiles/ev3MotorTest.elf
-#echo "end of program"
+rebuildDetails="
+-------- REBUILD DETAILS ----------
+optimization Level: ${optimizationLevel}
+verbosity         : ${verbose}
+"
+if [ $newFile = false ]; then
+    rebuildDetails=""
+fi
+
+echo "
+Build configuration details ----------------------------------------------------------------
+------- GLOBAL DETAILS -----------
+Reconfigure files : ${newFile}
+Wipe bin folder   : ${wipeBin}
+${rebuildDetails}
+Commands used     : $@
+--------------------------------------------------------------------------------------
+"
+if [ $wipeBin = true ]; then
+    echo "Wiping bin folder"
+    sudo rm -rf build
+    sudo rm -rf CMakeFiles
+fi
+if [ $newFile = true ]; then
+    echo "Reconfiguring cmake files"
+    cmake ./ \
+        -G"Unix Makefiles" \
+        -B"build" \
+        -DOPTIMIZATION_LEVEL=${optimizationLevel} \
+        -DVERBOSE=${verbose}
+fi
+
+echo "building library starting with $(nproc) jobs"
+
+cmake --build build -j$(nproc)

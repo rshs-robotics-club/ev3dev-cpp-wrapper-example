@@ -2,3 +2,6 @@
 /build/
 /src/*
 !/src/copyfromhere/README.md
+Makefile
+CMakeCache.txt
+cmake_install.cmake
