@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # 
 #    A bash script used with Docker for compiling The Ev3dev C++ Wrapper Library
 #
@@ -13,18 +14,21 @@
 #    You should have received a copy of the GNU General Public License 
 #    along with The Ev3dev C++ Wrapper Library. If not, see <https://www.gnu.org/licenses/>.
 
+# some presets ---------------------------------------------------------------------------
+containerName="EV3PROGRAM"
+scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+srcDir=${scriptDir}/../
 
-CONTAINER_NAME="EV3PROGRAM"
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-SRC_DIR=${SCRIPT_DIR}/../
+entrypointCMD="/${scriptDir}/runWithinContainer.sh"
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    docker rm ${CONTAINER_NAME}
-    docker run --entrypoint /${SRC_DIR}/scripts/runWithinContainer.sh --name ${CONTAINER_NAME} -v /${SRC_DIR}:/${SRC_DIR} -w /${SRC_DIR} ev3cc
+    docker rm ${containerName}
+    docker run --entrypoint ${entrypointCMD} --name ${containerName} -v /${srcDir}:/${srcDir} -w /${srcDir} eisverygoodletter/debian-stretch-cross $@
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    docker rm ${CONTAINER_NAME}
-    docker run --entrypoint /${SRC_DIR}/scripts/runWithinContainer.sh --name ${CONTAINER_NAME} -v /${SRC_DIR}:/${SRC_DIR} -w /${SRC_DIR} ev3cc
+    docker rm ${containerName}
+    docker run --entrypoint ${entrypointCMD} --name ${containerName} -v /${srcDir}:/${srcDir} -w /${srcDir} eisverygoodletter/debian-stretch-cross $@
 else
-    winpty docker rm ${CONTAINER_NAME}
-    winpty docker run --entrypoint /${SRC_DIR}/scripts/runWithinContainer.sh --name ${CONTAINER_NAME} -v /${SRC_DIR}:/${SRC_DIR} -w /${SRC_DIR} ev3cc
+    winpty docker rm ${containerName}
+    winpty docker run --entrypoint ${entrypointCMD} --name ${containerName} -v /${srcDir}:/${srcDir} -w /${srcDir} eisverygoodletter/debian-stretch-cross $@
 fi
 $SHELL
