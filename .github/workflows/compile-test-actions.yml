@@ -15,11 +15,11 @@ jobs:
           sudo apt-get install -y git
       - uses: actions/checkout@v3
         with: 
-          path: main
+          path: ./
       - uses: actions/checkout@v3
         with:
           repository: rshs-robotics-club/ev3dev-cpp-template-wrapper
-          path: ./
+          path: ./ev3dev-cpp-template-wrapper
       - name: compile it
         run: |
           sudo chmod +x ./scripts/runWithinContainer.sh
