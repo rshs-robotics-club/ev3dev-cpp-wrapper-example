@@ -17,13 +17,13 @@ jobs:
       - name: Setup docker images
         run: sudo bash ./ev3dev-cpp-template-wrapper/scripts/dockersetup.sh
       - name: compile the contents
-        run: sudo bash ./scripts/compile.sh
+        run: sudo bash ./scripts/compile.sh -w
   compile-inside-container:
     runs-on: ubuntu-latest
     env:
       GIT_DISCOVERY_ACROSS_FILESYSTEM: 1
     container: 
-      image: ev3dev/debian-stretch-cross:latest
+      image: eisverygoodletter/debian-stretch-cross:latest
       options: --user root -e GIT_DISCOVERY_ACROSS_FILESYSTEM=1
     steps:
       - name: install git
