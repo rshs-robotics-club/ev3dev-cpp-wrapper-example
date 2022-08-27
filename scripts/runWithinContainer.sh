@@ -67,8 +67,9 @@ Commands used     : $@
 --------------------------------------------------------------------------------------
 "
 if [ $wipeBin = true ]; then
-    echo "Wiping bin folder"
+    echo "Wiping bin, build and CMakeFiles folder"
     sudo rm -rf build
+    sudo rm -rf bin
     sudo rm -rf CMakeFiles
 fi
 if [ $newFile = true ]; then
@@ -82,4 +83,4 @@ fi
 
 echo "building library starting with $(nproc) jobs"
 
-cmake --build build -j$(nproc)
+cmake --build build -j $(nproc)

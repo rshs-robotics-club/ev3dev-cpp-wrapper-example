@@ -33,22 +33,7 @@ file(GLOB tempLinkFiles "./src/templinks/*.cpp")
 set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 foreach(file ${files})
     get_filename_component(fileName ${file} NAME_WE)
-    #target_include_directories(${fileName}_EXECUTABLE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_executable(${fileName}_EXECUTABLE ${file} ${tempLinkFiles})
-    # target_precompile_headers(${LIBNAME}
-#     PUBLIC
-#     lib/blockable/ev3wrapblockable.hpp
-#     lib/button/ev3wrapbutton.hpp
-#     lib/color/ev3wrapcolor.hpp
-#     lib/compass/ev3wrapcompass.hpp
-#     lib/irseeker/ev3wrapirseeker.hpp
-#     lib/motor/ev3wrapmotor.hpp
-#     lib/ultrasonic/ev3wrapultrasonic.hpp
-#     lib/utilities/ev3wraputilities.hpp
-#     lib/vector/ev3wrapvector.hpp
-#     lib/ev3dev.h
-#     lib/ev3wrap.hpp
-# )
     set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
     target_link_libraries(${fileName}_EXECUTABLE ev3-cpp-template-wrapper-lib)
     
@@ -56,6 +41,11 @@ foreach(file ${files})
         ${fileName}_EXECUTABLE
         PROPERTIES
         OUTPUT_NAME ${fileName}.elf
+    )
+    add_custom_command(
+        TARGET ${fileName}_EXECUTABLE POST_BUILD
+        COMMAND sudo mkdir -p ${YOUR_PROJECT_FINISHED_DIR}
+        COMMAND sudo cp ${PROJECT_BINARY_DIR}/${fileName}.elf  ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf
     )
     if (${VERBOSE}) 
         add_custom_target(
@@ -66,8 +56,6 @@ foreach(file ${files})
         add_dependencies(${fileName}_TARGET ${fileName}_EXECUTABLE)
         add_custom_command(
             TARGET ${fileName}_TARGET POST_BUILD
-            COMMAND sudo mkdir -p ${YOUR_PROJECT_FINISHED_DIR}
-            COMMAND sudo cp ${PROJECT_BINARY_DIR}/${fileName}.elf  ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf
             COMMAND sudo bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/post_build.sh ${fileName}.elf 500 ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf 50
         )
     endif()
