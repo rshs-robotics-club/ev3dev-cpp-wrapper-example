@@ -22,20 +22,23 @@ set(CMAKE_CC_COMPILER "arm-linux-gnueabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-linux-gnueabi-g++")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
-add_compile_options(${OPTIMIZATION_LEVEL})
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(ev3dev-cpp-template-wrapper .${CURRENT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/bin)
 
-project(container_project VERSION 2.5.2)
+project(container_project VERSION 3.0.1)
+add_compile_options(${OPTIMIZATION_LEVEL})
+add_compile_options(-fpermissive)
 file(GLOB files "./src/*.cpp")
 file(GLOB tempLinkFiles "./src/templinks/*.cpp")
 set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
 foreach(file ${files})
     get_filename_component(fileName ${file} NAME_WE)
     add_executable(${fileName}_EXECUTABLE ${file} ${tempLinkFiles})
     set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-    target_link_libraries(${fileName}_EXECUTABLE ev3-cpp-template-wrapper-lib)
+    target_link_libraries(${fileName}_EXECUTABLE PRIVATE ev3-cpp-template-wrapper-lib)
     
     set_target_properties(
         ${fileName}_EXECUTABLE
