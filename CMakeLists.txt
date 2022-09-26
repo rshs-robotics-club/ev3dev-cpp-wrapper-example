@@ -38,6 +38,7 @@ foreach(file ${files})
     get_filename_component(fileName ${file} NAME_WE)
     add_executable(${fileName}_EXECUTABLE ${file} ${tempLinkFiles})
     set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+    target_include_directories(${fileName}_EXECUTABLE PRIVATE "./src/templinks/")
     target_link_libraries(${fileName}_EXECUTABLE PRIVATE ev3-cpp-template-wrapper-lib)
     
     set_target_properties(
