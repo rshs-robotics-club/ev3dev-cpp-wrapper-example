@@ -18,3 +18,4 @@ RUN dpkg -x libbluetooth-dev_5.43-2+deb9u5_armel.deb ./temp && \
     mkdir ./crossCompileLibraries/libbluetooth && \
     cp -r ./temp/usr/. ./crossCompileLibraries/libbluetooth && \
     rm -r ./temp
+RUN sudo apt-get -y install git

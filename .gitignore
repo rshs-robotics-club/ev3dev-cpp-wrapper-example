@@ -2,6 +2,7 @@
 /build/
 /src/*
 !/src/templinks/README.md
+!/src/templinks/empty.cpp
 !/src/copyfromhere/README.md
 Makefile
 CMakeCache.txt

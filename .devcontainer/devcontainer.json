@@ -2,6 +2,7 @@
   "features": {
   },
   "build": {
-    "dockerfile": "Dockerfile" 
-  }
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": "bash ./.devcontainer/postCreateCommand.sh"
 }
