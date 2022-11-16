@@ -22,40 +22,56 @@ set(CMAKE_CC_COMPILER "arm-linux-gnueabi-gcc")
 set(CMAKE_CXX_COMPILER "arm-linux-gnueabi-g++")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
-add_compile_options(${OPTIMIZATION_LEVEL})
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(ev3dev-cpp-template-wrapper .${CURRENT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/bin)
 
-project(container_project VERSION 2.5.2)
+project(container_project VERSION 3.0.1)
+add_compile_options(${OPTIMIZATION_LEVEL})
+add_compile_options(-fpermissive)
 file(GLOB files "./src/*.cpp")
 file(GLOB tempLinkFiles "./src/templinks/*.cpp")
 set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+SUBDIRLIST(SUBDIRS ${PROJECT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/lib/)
+
+add_library(LIBTEMPLINK STATIC ${tempLinkFiles})
+target_include_directories(LIBTEMPLINK PRIVATE "./src/templinks/")
+target_link_libraries(LIBTEMPLINK ev3dev-cpp-template-wrapper-lib)
+foreach(subdir ${SUBDIRS})
+    target_include_directories(LIBTEMPLINK PUBLIC ${PROJECT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/lib/${subdir})
+endforeach()
+target_include_directories(LIBTEMPLINK PUBLIC ${PROJECT_SOURCE_DIR}/ev3dev-cpp-template-wrapper/lib/)
+
 foreach(file ${files})
     get_filename_component(fileName ${file} NAME_WE)
-    #target_include_directories(${fileName}_EXECUTABLE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-    add_executable(${fileName}_EXECUTABLE ${file} ${tempLinkFiles})
-    # target_precompile_headers(${LIBNAME}
-#     PUBLIC
-#     lib/blockable/ev3wrapblockable.hpp
-#     lib/button/ev3wrapbutton.hpp
-#     lib/color/ev3wrapcolor.hpp
-#     lib/compass/ev3wrapcompass.hpp
-#     lib/irseeker/ev3wrapirseeker.hpp
-#     lib/motor/ev3wrapmotor.hpp
-#     lib/ultrasonic/ev3wrapultrasonic.hpp
-#     lib/utilities/ev3wraputilities.hpp
-#     lib/vector/ev3wrapvector.hpp
-#     lib/ev3dev.h
-#     lib/ev3wrap.hpp
-# )
+    add_executable(${fileName}_EXECUTABLE ${file})
     set(YOUR_PROJECT_FINISHED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-    target_link_libraries(${fileName}_EXECUTABLE ev3-cpp-template-wrapper-lib)
+    target_include_directories(${fileName}_EXECUTABLE PRIVATE "./src/templinks/")
+    target_link_libraries(${fileName}_EXECUTABLE ev3dev-cpp-template-wrapper-lib)
+    target_include_directories(${fileName}_EXECUTABLE PUBLIC ${SUBDIRS})
+    target_link_libraries(${fileName}_EXECUTABLE LIBTEMPLINK)
     
     set_target_properties(
         ${fileName}_EXECUTABLE
         PROPERTIES
         OUTPUT_NAME ${fileName}.elf
+    )
+    add_custom_command(
+        TARGET ${fileName}_EXECUTABLE POST_BUILD
+        COMMAND sudo mkdir -p ${YOUR_PROJECT_FINISHED_DIR}
+        COMMAND sudo cp ${PROJECT_BINARY_DIR}/${fileName}.elf  ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf
     )
     if (${VERBOSE}) 
         add_custom_target(
@@ -66,8 +82,6 @@ foreach(file ${files})
         add_dependencies(${fileName}_TARGET ${fileName}_EXECUTABLE)
         add_custom_command(
             TARGET ${fileName}_TARGET POST_BUILD
-            COMMAND sudo mkdir -p ${YOUR_PROJECT_FINISHED_DIR}
-            COMMAND sudo cp ${PROJECT_BINARY_DIR}/${fileName}.elf  ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf
             COMMAND sudo bash ${CMAKE_CURRENT_SOURCE_DIR}/scripts/post_build.sh ${fileName}.elf 500 ${YOUR_PROJECT_FINISHED_DIR}/${fileName}.elf 50
         )
     endif()
