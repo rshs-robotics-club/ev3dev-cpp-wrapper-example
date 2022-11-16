@@ -1,4 +1,9 @@
 /bin/
 /build/
 /src/*
+!/src/templinks/README.md
 !/src/copyfromhere/README.md
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+

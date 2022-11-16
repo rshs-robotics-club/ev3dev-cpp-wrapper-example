@@ -1,0 +1,1 @@
+This is a folder for storing .h or .cpp files that you would like to temporarily link to your program(s). Do not place permanent content here.
